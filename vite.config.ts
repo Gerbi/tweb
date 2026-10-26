@@ -319,6 +319,9 @@ export default defineConfig({
     // a full run waits for its turn in the machine-wide queue of heavy test runs (scripts/test-queue.sh)
     maxWorkers: vitestWorkers(),
     globals: true,
+    // Vitest 5 clears every mock before each test by default; the suite counts
+    // calls made while a module loads (the ResizeObserver a component makes)
+    clearMocks: false,
     setupFiles: ['./src/tests/setup.ts']
   },
   server: serverOptions,

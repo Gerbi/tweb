@@ -34,7 +34,7 @@
     {
       "name": "tweb-popups",
       "runtimeExecutable": "bash",
-      "runtimeArgs": ["-c", "TWEB_PREVIEW=1 exec pnpm --config.verify-deps-before-run=false exec vite --host 127.0.0.1 --port 9007 --strictPort"],
+      "runtimeArgs": ["-c", "TWEB_PREVIEW=1 exec pnpm --config.verify-deps-before-run=false exec vp dev --host 127.0.0.1 --port 9007 --strictPort"],
       "port": 9007
     }
   ]

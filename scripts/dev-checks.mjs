@@ -127,10 +127,13 @@ export default function devChecks(rootDir) {
       let lintTimer;
 
       function run(name, args, label, onLine) {
-        const child = spawn(getBinaryPath(rootDir, name), args, {
+        const isWindows = process.platform === 'win32';
+        const binaryPath = getBinaryPath(rootDir, name);
+        // a .cmd needs the shell, which splits an unquoted path at its spaces
+        const child = spawn(isWindows ? `"${binaryPath}"` : binaryPath, args, {
           cwd: rootDir,
           env: process.env,
-          shell: process.platform === 'win32',
+          shell: isWindows,
           stdio: ['ignore', 'pipe', 'pipe']
         });
 

@@ -26,6 +26,9 @@ overrides:
   '@tiptap/extensions': *tiptapVersion
   '@tiptap/pm': *tiptapVersion
   '@tiptap/starter-kit': *tiptapVersion
+  # Vite+ ships its own Vite core and Vitest: every package resolves to the catalog's
+  'vite@*': 'catalog:'
+  'vitest@*': 'catalog:'
 
 allowBuilds:
   '@parcel/watcher@2.6.0': true
@@ -77,3 +80,16 @@ minimumReleaseAgeExclude:
 # and src/tests/instantViewMathBudget.test.ts checks the shipped build for it.
 patchedDependencies:
   temml: patches/temml.patch
+
+# Vite+ (https://viteplus.dev): `vp dev` / `vp build` / `vp test` run on these
+catalog:
+  vite: 'npm:@voidzero-dev/vite-plus-core@1.4.0'
+  vitest: 5.0.5
+  vite-plus: 1.4.0
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: '*'
+    vitest: '*'

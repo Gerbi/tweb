@@ -10,7 +10,7 @@ const MODULES_PORT = e2ePort('popupsModules');
 // The app's server for the sandbox suites (vite.popups-e2e.config.ts): a bundle, ready once it is built, which
 // /__e2e/ready says — or, `bundled` false, the modules as they are
 export const appServer = (port = PORT, bundled = true) => ({
-  command: `node_modules/.bin/vite --config vite.popups-e2e.config.ts --host 127.0.0.1 --port ${port} --strictPort`,
+  command: `node_modules/.bin/vp dev --config vite.popups-e2e.config.ts --host 127.0.0.1 --port ${port} --strictPort`,
   url: `http://127.0.0.1:${port}/__e2e/ready`,
   env: {TWEB_PREVIEW: '1', TWEB_E2E: '1', ...(!bundled && {TWEB_E2E_BUNDLED: '0'})},
   reuseExistingServer: false,

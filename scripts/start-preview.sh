@@ -752,11 +752,13 @@ echo "[start-preview] preview: http://localhost:$PORT"
 # and a preview answers whichever form the caller uses, by name or by literal.
 # Still loopback: not exposed to the LAN.
 VITE=(env PREVIEW_SEED="$SEED" PREVIEW_SEED_2="${SECOND_SEED:+$SEED_2}" TWEB_PREVIEW=1 TWEB_NO_WORKER="$NO_WORKER"
-      pnpm --config.verify-deps-before-run=false exec vite --config vite.preview.config.ts)
+      pnpm --config.verify-deps-before-run=false exec vp)
+# vp takes the command first and forwards the rest to Vite
+CONFIG=(--config vite.preview.config.ts)
 
 if [ "$BUNDLED" = 1 ]; then
   echo "[start-preview] full bundle mode: one in-memory bundle for local and remote requests, hot-patched on edit"
-  exec "${VITE[@]}" --experimentalBundle --host 127.0.0.1 --port "$PORT" --strictPort
+  exec "${VITE[@]}" dev "${CONFIG[@]}" --experimentalBundle --host 127.0.0.1 --port "$PORT" --strictPort
 fi
 
 if [ "$HMR" = 1 ]; then
@@ -765,7 +767,7 @@ if [ "$HMR" = 1 ]; then
   # `exec` keeps this pid — the one the registry knows the preview by.
   echo "[start-preview] hot reload on localhost; remote requests get a built bundle unless TWEB_PREVIEW_REMOTE=dev (?static=1 forces it, ?static=0 skips it)"
   exec env TWEB_PREVIEW_STATIC_DIR="$REPO/tmp/preview-dist/$ID" \
-    "${VITE[@]}" --host 127.0.0.1 --port "$PORT" --strictPort
+    "${VITE[@]}" dev "${CONFIG[@]}" --host 127.0.0.1 --port "$PORT" --strictPort
 fi
 
 # --- static mode --------------------------------------------------------------
@@ -781,7 +783,7 @@ if [ "$WATCH" = 1 ]; then
   # TWEB_PREVIEW_KEEP_OUTDIR: do NOT wipe the dir between rebuilds. A phone that
   # loaded index.html seconds ago is still pulling its chunks; emptying the dir
   # would 404 them mid-load.
-  TWEB_PREVIEW_KEEP_OUTDIR=1 "${VITE[@]}" build --outDir "$OUT" --watch >"$LOG" 2>&1 &
+  TWEB_PREVIEW_KEEP_OUTDIR=1 "${VITE[@]}" build "${CONFIG[@]}" --outDir "$OUT" --watch >"$LOG" 2>&1 &
   BUILD_PID=$!
   echo "[start-preview] building (watch) -> $OUT   log: $LOG"
   for i in $(seq 1 600); do
@@ -795,7 +797,7 @@ if [ "$WATCH" = 1 ]; then
   echo "[start-preview] first build done — every rebuild reloads the open pages (?autoreload=0 keeps a tab as it is)"
 else
   echo "[start-preview] building -> $OUT"
-  "${VITE[@]}" build --outDir "$OUT"
+  "${VITE[@]}" build "${CONFIG[@]}" --outDir "$OUT"
 fi
 
 # The build does NOT copy public/ (build.copyPublicDir is false: the production
@@ -808,4 +810,4 @@ ln -sfn "$REPO/public/assets" "$OUT/assets"
 
 # `vite preview` is a plain static server: no /@vite/client, no websocket, so a
 # backgrounded mobile tab has nothing to lose and nothing to reload for.
-"${VITE[@]}" preview --outDir "$OUT" --host 127.0.0.1 --port "$PORT" --strictPort
+"${VITE[@]}" preview "${CONFIG[@]}" --outDir "$OUT" --host 127.0.0.1 --port "$PORT" --strictPort

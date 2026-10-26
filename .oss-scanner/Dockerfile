@@ -23,7 +23,7 @@ RUN pnpm install --frozen-lockfile
 # The production bundle, with source maps. `pnpm build` runs the unit tests and
 # the typecheck first and stops at a failure; here they run below instead,
 # where a failure must not fail the image.
-RUN pnpm exec vite build && test -f dist/index.html
+RUN pnpm exec vp build && test -f dist/index.html
 
 # Chromium for the Playwright suites, such as `pnpm test:popups`.
 RUN pnpm exec playwright install --with-deps chromium

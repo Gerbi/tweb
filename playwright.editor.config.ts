@@ -47,7 +47,7 @@ export default defineConfig<{freshContext: boolean}, {samePage: boolean}>({
     ] : [])
   ],
   webServer: {
-    command: `node_modules/.bin/vite --config vite.editor-e2e.config.ts --host 127.0.0.1 --port ${PORT} --strictPort`,
+    command: `node_modules/.bin/vp dev --config vite.editor-e2e.config.ts --host 127.0.0.1 --port ${PORT} --strictPort`,
     url: `http://127.0.0.1:${PORT}/e2e/fixtures/chatInputEditor.html`,
     env: {
       TWEB_E2E: '1',
