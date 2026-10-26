@@ -1,4 +1,4 @@
-// * tweb's own lint rules, loaded by .oxlintrc.json (jsPlugins, ESLint's plugin format)
+// * tweb's own lint rules, loaded by the `lint` block of vite.config.ts (jsPlugins, ESLint's plugin format)
 
 // * a callback handed to these runs later, once whatever it waits for is done - as code after an await does
 const LATER_CALLBACKS = new Set(['then', 'catch', 'finally', 'setTimeout']);

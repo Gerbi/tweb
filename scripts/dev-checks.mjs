@@ -194,7 +194,7 @@ export default function devChecks(rootDir) {
         }
 
         const lintLines = [];
-        lint = run('oxlint', ['src'], 'lint', (line) => {
+        lint = run('vp', ['lint', 'src'], 'lint', (line) => {
           if(line.trim()) {
             lintLines.push(line);
           }

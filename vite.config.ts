@@ -1,5 +1,6 @@
 /// <reference types="vitest/config" />
-import {defineConfig, searchForWorkspaceRoot} from 'vite';
+import {searchForWorkspaceRoot} from 'vite';
+import {defineConfig} from 'vite-plus';
 import solidPlugin from 'vite-plugin-solid';
 // @ts-ignore no type declarations
 import handlebars from 'vite-plugin-handlebars';
@@ -44,21 +45,31 @@ if(!existsSync(LANG_PACK_LOCAL_FILE_PATH)) {
   copyFileSync(path.join(rootDir, 'src', 'langPackLocalVersion.example.ts'), LANG_PACK_LOCAL_FILE_PATH);
 }
 
-if(isDEV) {
-  if(!existsSync(ENV_LOCAL_FILE_PATH)) {
-    copyFileSync(path.join(rootDir, '.env.local.example'), ENV_LOCAL_FILE_PATH);
-  }
+if(isDEV && !existsSync(ENV_LOCAL_FILE_PATH)) {
+  copyFileSync(path.join(rootDir, '.env.local.example'), ENV_LOCAL_FILE_PATH);
+}
 
-  // A Playwright suite's server (TWEB_E2E) only serves the tree: the lang watcher would hash the
-  // strings on every start and, after a lang.ts edit, run format-lang and rewrite files under the
-  // run, and nobody edits SCSS through it.
-  if(!process.env.TWEB_E2E) {
-    watchLangFile();
-    // the dev server is what runs while the SCSS is being edited, so it is what keeps the generated
-    // `*.module.d.scss.ts` in step — otherwise the editor (and `typecheck:watch`) reports a class
-    // that was just renamed as missing until someone remembers to regenerate.
-    watchScssTypes();
-  }
+// The watchers start with the dev server, not with the config: `vp lint` loads this config too
+// (for its `lint` block), and a watcher would keep it running.
+function devWatchersPlugin(): Plugin {
+  return {
+    name: 'tweb:dev-watchers',
+    apply: 'serve',
+    configureServer() {
+      // A Playwright suite's server (TWEB_E2E) only serves the tree: the lang watcher would hash the
+      // strings on every start and, after a lang.ts edit, run format-lang and rewrite files under the
+      // run, and nobody edits SCSS through it.
+      if(!isDEV || process.env.TWEB_E2E) {
+        return;
+      }
+
+      watchLangFile();
+      // the dev server is what runs while the SCSS is being edited, so it is what keeps the generated
+      // `*.module.d.scss.ts` in step — otherwise the editor (and `typecheck:watch`) reports a class
+      // that was just renamed as missing until someone remembers to regenerate.
+      watchScssTypes();
+    }
+  };
 }
 
 const handlebarsPlugin = handlebars({
@@ -255,6 +266,7 @@ export default defineConfig({
     //   autoname: true // e.g. enable autoname
     // }),
     process.env.VITEST || process.env.TWEB_PREVIEW ? undefined : devChecks(rootDir),
+    devWatchersPlugin(),
     process.env.VITEST ? undefined : settingsSearchPlugin(),
     watchTransformCache(),
     hotReloadPlugin(),
@@ -323,6 +335,131 @@ export default defineConfig({
     // calls made while a module loads (the ResizeObserver a component makes)
     clearMocks: false,
     setupFiles: ['./src/tests/setup.ts']
+  },
+  // `vp lint` (oxlint): the style rules come from @stylistic, tweb's own from scripts/oxlint
+  lint: {
+    categories: {correctness: 'off'},
+    env: {browser: true, es6: true},
+    ignorePatterns: [
+      '.claude/worktrees/**',
+      '.pnpm-store/**',
+      'src/vendor/**',
+      'src/solid/**',
+      'src/opus-recorder/**',
+      'src/**/*.js',
+      'src/lib/mtproto/schema.ts',
+      'src/config/emoji.ts',
+      'src/countries.ts',
+      'src/config/currencies.ts',
+      'public/**'
+    ],
+    jsPlugins: [
+      {name: 'style', specifier: '@stylistic/eslint-plugin'},
+      {name: 'tweb', specifier: './scripts/oxlint/twebPlugin.mjs'}
+    ],
+    options: {typeAware: true},
+    plugins: ['react', 'unicorn', 'typescript', 'oxc', 'jsx-a11y'],
+    overrides: [
+      {files: ['src/tests/**'], rules: {'jsx-a11y/control-has-associated-label': 'off'}},
+      {files: ['src/**/*.ts', 'src/**/*.tsx'], rules: {'tweb/managers-before-await': 'error'}},
+      {
+        files: [
+          'src/components/chat/bubbles.ts',
+          'src/components/chat/chat.ts',
+          'src/components/chat/contextMenu.ts',
+          'src/components/chat/inlineHelper.ts',
+          'src/components/chat/input.ts',
+          'src/components/chat/topbar.ts',
+          'src/components/mediaViewer/rtmp.ts',
+          'src/lib/calls/callInstance.ts',
+          'src/lib/calls/groupCallConnectionInstance.ts',
+          'src/lib/calls/groupCallInstance.ts'
+        ],
+        rules: {'tweb/managers-before-await': ['error', {allowThis: true}]}
+      },
+      {
+        files: [
+          'src/tests/**',
+          'src/index.ts',
+          'src/components/popupSandbox/**',
+          'src/lib/appManagers/**',
+          'src/lib/crypto/**',
+          'src/lib/mainWorker/**',
+          'src/lib/mtproto/**',
+          'src/lib/serviceWorker/**'
+        ],
+        rules: {'tweb/managers-before-await': 'off'}
+      }
+    ],
+    rules: {
+      'jsx-a11y/alt-text': 'error',
+      'jsx-a11y/anchor-has-content': 'error',
+      'jsx-a11y/aria-props': 'error',
+      'jsx-a11y/aria-proptypes': 'error',
+      'jsx-a11y/aria-role': [
+        'error',
+        {ignoreNonDOM: true}
+      ],
+      'jsx-a11y/aria-unsupported-elements': 'error',
+      'jsx-a11y/control-has-associated-label': 'error',
+      'jsx-a11y/heading-has-content': 'error',
+      'jsx-a11y/no-redundant-roles': 'error',
+      'jsx-a11y/role-has-required-aria-props': 'error',
+      'jsx-a11y/role-supports-aria-props': 'error',
+      'jsx-a11y/tabindex-no-positive': 'error',
+      'style/keyword-spacing': [
+        'error',
+        {
+          after: true,
+          overrides: {
+            if: {before: true, after: false},
+            else: {before: true},
+            catch: {before: true, after: false},
+            for: {after: false},
+            while: {after: false},
+            switch: {after: false}
+          }
+        }
+      ],
+      'style/linebreak-style': ['error', 'unix'],
+      'style/eol-last': 'error',
+      'style/space-before-function-paren': ['error', 'never'],
+      'style/comma-dangle': ['error', 'never'],
+      'style/comma-spacing': 'error',
+      'style/comma-style': 'error',
+      'style/quotes': [
+        'error',
+        'single',
+        {allowTemplateLiterals: 'always'}
+      ],
+      'style/space-before-blocks': ['error', 'always'],
+      'style/spaced-comment': ['error', 'always'],
+      'eslint/prefer-const': [
+        'error',
+        {destructuring: 'all'}
+      ],
+      'style/object-curly-spacing': ['error', 'never'],
+      'style/array-bracket-spacing': ['error', 'never'],
+      'style/switch-colon-spacing': 'error',
+      'style/padded-blocks': ['error', 'never'],
+      'eslint/no-useless-call': 'error',
+      'style/no-trailing-spaces': 'error',
+      'style/no-mixed-spaces-and-tabs': 'error',
+      'style/no-multiple-empty-lines': [
+        'error',
+        {max: 2}
+      ],
+      'style/no-tabs': 'error',
+      'eslint/no-multi-str': 'error',
+      'eslint/no-new-wrappers': 'error',
+      'eslint/no-irregular-whitespace': [
+        'error',
+        {skipStrings: true, skipComments: true, skipRegExps: true, skipTemplates: true}
+      ],
+      'eslint/no-unexpected-multiline': 'error',
+      'typescript/return-await': ['error', 'error-handling-correctness-only'],
+      'typescript/await-thenable': 'off'
+    }
   },
   server: serverOptions,
   base: '',

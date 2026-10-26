@@ -31,7 +31,7 @@ pnpm install
 pnpm start          # Dev server on :8080
 pnpm build          # Production build → dist/
 pnpm test           # Run tests (Vitest)
-pnpm lint           # oxlint on the whole repo (config: .oxlintrc.json)
+pnpm lint           # vp lint (oxlint) on the whole repo (config: the `lint` block of vite.config.ts)
 pnpm lint:fix       # Same, with auto-fix
 ```
 
@@ -579,7 +579,7 @@ import {Message, Chat, User, InputPeer} from '@layer';
 | `src/config/app.ts` | App constants |
 | `src/lib/rootScope.ts` | Global event emitter |
 | `vite.config.ts` | Build configuration |
-| `.oxlintrc.json` | oxlint config (style rules via `@stylistic/eslint-plugin` jsPlugin) |
+| `vite.config.ts` → `lint` | `vp lint` (oxlint) config (style rules via `@stylistic/eslint-plugin` jsPlugin) |
 
 ## Agent Workflow
 
