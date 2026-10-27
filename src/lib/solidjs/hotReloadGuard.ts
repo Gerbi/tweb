@@ -3,7 +3,7 @@ import {createContext, useContext} from 'solid-js';
 import AppMediaViewer, {onMediaCaptionClick} from '@components/mediaViewer';
 import AppMediaViewerStatic from '@components/mediaViewer/static';
 import {AutonomousMonoforumThreadList} from '@components/autonomousDialogList/monoforumThreads';
-import {openInstantViewInAppBrowser} from '@components/browser';
+import {openInAppBrowser, openInstantViewInAppBrowser} from '@components/browser';
 import {avatarNew, AvatarNewTsx, StoriesSegments} from '@components/avatarNew';
 import BusinessHours from '@components/businessHours';
 import ButtonMenu, {ButtonMenuSync} from '@components/buttonMenu';
@@ -179,6 +179,8 @@ export type SolidJSHotReloadGuardContextValue = {
   createStoriesViewerWithPeer: typeof createStoriesViewerWithPeer;
   createStoriesViewerWithProvider: typeof createStoriesViewerWithProvider;
   openInstantViewInAppBrowser: typeof openInstantViewInAppBrowser;
+  /** a page of its own in the in-app browser (a document being read) */
+  openInAppBrowser: typeof openInAppBrowser;
   /** it closes and reopens the app's screens, so it is the top level too */
   switchAccount: typeof switchAccount;
   /** the sign-in of an account added over the app gives way to what was asked for from outside it */

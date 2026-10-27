@@ -4,7 +4,7 @@
 import AppMediaViewer, {onMediaCaptionClick} from '@components/mediaViewer';
 import AppMediaViewerStatic from '@components/mediaViewer/static';
 import {AutonomousMonoforumThreadList} from '@components/autonomousDialogList/monoforumThreads';
-import {openInstantViewInAppBrowser} from '@components/browser';
+import {openInAppBrowser, openInstantViewInAppBrowser} from '@components/browser';
 import {avatarNew, AvatarNewTsx, StoriesSegments} from '@components/avatarNew';
 import BusinessHours from '@components/businessHours';
 import ButtonMenu, {ButtonMenuSync} from '@components/buttonMenu';
@@ -178,6 +178,7 @@ registerHotReloadGuard({
   createStoriesViewerWithPeer,
   createStoriesViewerWithProvider,
   openInstantViewInAppBrowser,
+  openInAppBrowser,
   switchAccount,
   closeAddAccount,
   tabs

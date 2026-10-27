@@ -550,6 +550,10 @@
 "Popup.Attach.RemoveSpoilers" = "Remove all spoilers";
 "TwoStepAuth.EmailCodeChangeEmail" = "Change Email";
 "MediaViewer.Context.Download" = "Download";
+"DocumentViewer.Contents" = "Contents";
+"DocumentViewer.PreviousChapter" = "Previous chapter";
+"DocumentViewer.NextChapter" = "Next chapter";
+"DocumentViewer.OpenFailed" = "This file could not be opened.";
 "MediaViewer.Context.Copy" = "Copy Media";
 "MediaViewer.ProfilePublicPhoto" = "Public Photo";
 "Profile" = "Profile";

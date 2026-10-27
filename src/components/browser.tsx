@@ -50,15 +50,13 @@ import limitSymbols from '@helpers/string/limitSymbols';
 import {toastNew} from '@components/toast';
 import pause from '@helpers/schedulers/pause';
 import assumeType from '@helpers/assumeType';
-import {useAppSettings} from '@stores/appSettings';
-import cancelEvent from '@helpers/dom/cancelEvent';
-import clamp from '@helpers/number/clamp';
+import readingScaleMenuButton from '@components/readingScaleMenuButton';
 import windowSize from '@helpers/windowSize';
 import IS_TOUCH_SUPPORTED from '@environment/touchSupport';
 import {bindManagersToSession} from '@lib/accounts/bindManagersToAccount';
 import {getAccountSession, isSessionLeaving} from '@lib/accounts/getCurrentAccount';
 
-type BrowserPageProps<T = {}> = T & {
+export type BrowserPageProps<T = {}> = T & {
   title: string, // plain text
   icon: JSX.Element,
   dispose: () => void,
@@ -1140,7 +1138,6 @@ export function openInstantViewInAppBrowser({
     });
 
     const [_anchor, setAnchor] = createSignal(anchor, {equals: false});
-    const [appSettings, setAppSettings] = useAppSettings();
 
     const waitForReady = !lastContext && hadCachedPage;
     let wasReady = false;
@@ -1151,17 +1148,6 @@ export function openInstantViewInAppBrowser({
 
       wasReady = true;
       openInAppBrowser(initialState);
-    };
-
-    const scaleModifier = 0.1;
-    const changeScale = (add: boolean, e: MouseEvent) => {
-      cancelEvent(e);
-      setAppSettings(
-        'instantView',
-        'scale',
-        (value) => clamp(+(value + (add ? scaleModifier : -scaleModifier)).toFixed(2), 0.5, 1.5)
-      );
-      return false;
     };
 
     const initialState: BrowserPageProps<InstantViewPageExtraProps> = {
@@ -1178,16 +1164,7 @@ export function openInstantViewInAppBrowser({
         const textWithEntities = wrapTelegramRichText(block.text);
         return limitSymbols(textWithEntities.text, 20);
       },
-      menuButtons: [{
-        element: (
-          <span class={classNames('btn-menu-item', styles.ScaleMenu)}>
-            <span class={classNames(styles.ScaleMenuSmaller, 'hover-effect')} onClick={changeScale.bind(null, false)}>A</span>
-            <span class={styles.ScaleMenuScale}>{Math.round(appSettings.instantView.scale * 100) + '%'}</span>
-            <span class={classNames(styles.ScaleMenuBigger, 'hover-effect')} onClick={changeScale.bind(null, true)}>A</span>
-          </span>
-        ) as HTMLElement,
-        onClick: () => {}
-      }, {
+      menuButtons: [readingScaleMenuButton(), {
         icon: 'newtab',
         text: 'OpenInNewTab',
         onClick: () => safeWindowOpen(url),

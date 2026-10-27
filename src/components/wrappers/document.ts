@@ -37,6 +37,7 @@ import {Middleware} from '@helpers/middleware';
 import readBlobAsText from '@helpers/blob/readBlobAsText';
 import SolidJSHotReloadGuardProvider, {hotReloadGuard} from '@lib/solidjs/hotReloadGuardProvider';
 import {openMarkdownInstantView} from '@components/markdownInstantView';
+import isReadableInApp from '@components/documentViewer/isReadableInApp';
 import isPlayableDocument from '@appManagers/utils/docs/isPlayableDocument';
 import {hotListen} from '@helpers/hotModule';
 
@@ -367,6 +368,12 @@ export default async function wrapDocument({
           raw,
           HotReloadGuardProvider: SolidJSHotReloadGuardProvider
         });
+      }).catch(noop);
+    } else if(isReadableInApp(doc)) {
+      // a book is read in the app; the reader is loaded only now
+      download = appDownloadManager.downloadMedia({media: doc, queueId});
+      Promise.all([download, import('@components/documentViewer')]).then(([blob, {default: openDocumentViewer}]) => {
+        openDocumentViewer(doc, blob as Blob);
       }).catch(noop);
     } else if(doc.type === 'pdf' && false) {
       const canOpenAfter = /* managers.appDocsManager.downloading.has(doc.id) ||  */!preloader || preloader.detached;
