@@ -37,6 +37,8 @@ allowBuilds:
   # do not have, so its native binary never runs and never needs building
   'esbuild@0.17.19': false
   'esbuild@0.27.4': true
+  # its install script only checks for libvips: the prebuilt binary comes as an @img/* package
+  'sharp@0.34.4': false
   'ssh2@1.17.0': true
 minimumReleaseAgeExclude:
   - 'baseline-browser-mapping@2.11.0'

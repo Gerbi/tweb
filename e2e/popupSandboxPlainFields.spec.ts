@@ -152,7 +152,7 @@ test('an emoji is drawn the way a message draws it, and selected with the text a
     width: 18,
     height: 18,
     color: 'rgba(0, 0, 0, 0)',
-    background: expect.stringContaining('assets/img/emoji/1f603.png')
+    background: expect.stringContaining('assets/img/emoji/1f603.webp')
   });
   expect(await readField(page, CHECKLIST_TITLE)).toEqual({value: 'List \u{1F603} done', entities: []});
 

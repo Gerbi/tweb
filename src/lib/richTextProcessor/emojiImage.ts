@@ -28,5 +28,5 @@ export function areAllEmojiNative() {
 }
 
 export function getEmojiImageUrl(unicode: string) {
-  return `assets/img/emoji/${unicode}.png`;
+  return `assets/img/emoji/${unicode}.webp`;
 }

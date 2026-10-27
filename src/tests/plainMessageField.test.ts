@@ -648,7 +648,7 @@ describe('plain message field', () => {
       const [image, ...rest] = images(inputField.input);
       expect(rest).toEqual([]);
       expect(image.textContent).toBe('\u{1F603}');
-      expect(image.style.backgroundImage).toContain('assets/img/emoji/1f603.png');
+      expect(image.style.backgroundImage).toContain('assets/img/emoji/1f603.webp');
       expect(editor.getRichValue(true, false)).toMatchObject({value: 'a \u{1F603} b', entities: []});
     });
 
