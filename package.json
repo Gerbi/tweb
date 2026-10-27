@@ -10,6 +10,7 @@
     "serve": "pnpm run build && node server.js --dist",
     "build": "pnpm test --run && pnpm run typecheck && pnpm run generate-changelog && vp build && pnpm run check-bundle",
     "check-bundle": "node scripts/check-bundle-mangling.mjs dist",
+    "deploy:cloudflare": "node scripts/cloudflare-deploy.mjs --deploy",
     "test": "vp test",
     "test:a11y": "playwright test --config playwright.a11y.config.ts",
     "test:a11y:full": "A11Y_ALL_THEMES=1 playwright test --config playwright.a11y.config.ts",
