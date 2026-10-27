@@ -67,6 +67,10 @@ const name = args.name || process.env.CF_WORKER_NAME || 'tgweb';
 writeFileSync(join(stage, 'wrangler.jsonc'), JSON.stringify({
   name,
   compatibility_date: '2026-10-01',
+  // served only on the custom domains the Worker is given in the dashboard (gerbi.org):
+  // no <name>.<account>.workers.dev address, no per-version preview addresses
+  workers_dev: false,
+  preview_urls: false,
   assets: {
     directory: './assets'
   }
